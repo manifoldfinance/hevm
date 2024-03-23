@@ -1,16 +1,16 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="light" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>symbolic - hevm</title>
+        <title>Symbolic unit execution - hevm</title>
 
 
         <!-- Custom HTML head -->
         
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
@@ -29,9 +29,10 @@
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="book.css">
 
     </head>
-    <body>
+    <body class="sidebar-visible no-js">
     <div id="body-container">
         <!-- Provide site root to javascript -->
         <script>
@@ -61,31 +62,38 @@
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
             var html = document.querySelector('html');
-            html.classList.remove('no-js')
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
         </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var html = document.querySelector('html');
+            var body = document.querySelector('body');
             var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="overview.html">overview</a></li><li class="chapter-item expanded affix "><li class="part-title">Reference</li><li class="chapter-item expanded "><a href="symbolic.html" class="active"><strong aria-hidden="true">1.</strong> symbolic</a></li><li class="chapter-item expanded "><a href="equivalence.html"><strong aria-hidden="true">2.</strong> equivalence</a></li><li class="chapter-item expanded "><a href="exec.html"><strong aria-hidden="true">3.</strong> exec</a></li><li class="chapter-item expanded "><a href="dapp-test.html"><strong aria-hidden="true">4.</strong> dapp-test</a></li><li class="chapter-item expanded affix "><li class="part-title">Tutorials</li><li class="chapter-item expanded "><a href="controlling-the-unit-testing-environment.html"><strong aria-hidden="true">5.</strong> controlling the unit testing environment</a></li><li class="chapter-item expanded "><a href="using-the-visual-debugger.html"><strong aria-hidden="true">6.</strong> using the visual debugger</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">7.</strong> discovering reachable assertion violations</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">8.</strong> symbolic unit testing</div></li><li class="chapter-item expanded "><div><strong aria-hidden="true">9.</strong> equivalence checking</div></li></ol>
+                <ol class="chapter"><li class="chapter-item affix "><a href="overview.html">Quick Overview</a></li><li class="chapter-item affix "><li class="part-title">Tutorials</li><li class="chapter-item "><a href="dstest-tutorial.html">DSTest-based Testing</a></li><li class="chapter-item "><a href="equivalence-checking.html">Equivalence checking</a></li><li class="chapter-item affix "><li class="part-title">Reference</li><li class="chapter-item "><a href="test.html">DSTest-base Testing</a></li><li class="chapter-item expanded "><a href="symbolic.html" class="active">Symbolic unit execution</a></li><li class="chapter-item "><a href="equivalence.html">Equivalence checking</a></li><li class="chapter-item "><a href="exec.html">Concrete execution</a></li></ol>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
         </nav>
 
         <!-- Track and set sidebar scroll position -->
@@ -116,9 +124,9 @@
                                 <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
@@ -139,6 +147,12 @@
                     <div class="right-buttons">
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/ethereum/hevm" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="hhttps://github.com/ethereum/hevm/edit/main/src/symbolic.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
                         </a>
 
                     </div>
@@ -237,58 +251,40 @@ Available options:
                            (default: StackBased)
 </code></pre>
 <p>Run a symbolic execution against the given parameters, searching for assertion violations.</p>
-<p>Counterexamples will be returned for any reachable assertion violations. Where an assertion
-violation is defined as either an execution of the invalid opcode (<code>0xfe</code>), or a revert with a
-message of the form <code>abi.encodeWithSelector('Panic(uint256)', errCode)</code> with <code>errCode</code> being one of
-the predefined solc assertion codes defined
-<a href="https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require">here</a>.</p>
-<p>By default hevm ignores assertion violations that result from arithmetic overflow (<code>Panic(0x11)</code>),
-although this behaviour can be customised via the <code>--assertions</code> flag. For example, the following
-will return counterexamples for arithmetic overflow (<code>0x11</code>) and user defined assertions (<code>0x01</code>):</p>
+<p>Counterexamples will be returned for any reachable assertion violations. Where an assertion violation is defined as either an execution of the invalid opcode (<code>0xfe</code>), or a revert with a message of the form <code>abi.encodeWithSelector('Panic(uint256)', errCode)</code> with <code>errCode</code> being one of the predefined solc assertion codes defined <a href="https://docs.soliditylang.org/en/latest/control-structures.html#panic-via-assert-and-error-via-require">here</a>.</p>
+<p>By default hevm ignores assertion violations that result from arithmetic overflow (<code>Panic(0x11)</code>), although this behaviour can be customised via the <code>--assertions</code> flag. For example, the following will return counterexamples for arithmetic overflow (<code>0x11</code>) and user defined assertions (<code>0x01</code>):</p>
 <pre><code>hevm symbolic --code $CODE --assertions '[0x01, 0x11]'
 </code></pre>
 <p>The default value for <code>calldata</code> and <code>caller</code> are symbolic values, but can be specialized to concrete functions with their corresponding flags.</p>
-<p>One can also specialize specific arguments to a function signature, while leaving others abstract.
-If <code>--sig</code> is given, calldata is assumed to be of the form suggested by the function signature. With this flag, specific arguments can be instantiated to concrete values via the <code>--arg</code> flag.</p>
+<p>One can also specialize specific arguments to a function signature, while leaving others abstract. If <code>--sig</code> is given, calldata is assumed to be of the form suggested by the function signature. With this flag, specific arguments can be instantiated to concrete values via the <code>--arg</code> flag.</p>
 <p>This is best illustrated through a few examples:</p>
 <p>Calldata specialized to the bytestring <code>0xa9059cbb</code> followed by 64 symbolic bytes:</p>
-<pre><code class="language-sh">hevm symbolic --sig &quot;transfer(address,uint256)&quot; --code $(&lt;dstoken.bin-runtime)
+<pre><code class="language-sh">hevm symbolic --sig "transfer(address,uint256)" --code $(&lt;dstoken.bin-runtime)
 </code></pre>
 <p>Calldata specialized to the bytestring <code>0xa9059cbb0000000000000000000000007cfa93148b0b13d88c1dce8880bd4e175fb0dedf</code> followed by 32 symbolic bytes.</p>
-<pre><code class="language-sh">hevm symbolic --sig &quot;transfer(address,uint256)&quot; --arg 0x7cFA93148B0B13d88c1DcE8880bd4e175fb0DeDF --code $(&lt;dstoken.bin-runtime)
+<pre><code class="language-sh">hevm symbolic --sig "transfer(address,uint256)" --arg 0x7cFA93148B0B13d88c1DcE8880bd4e175fb0DeDF --code $(&lt;dstoken.bin-runtime)
 </code></pre>
 <p>Calldata specialized to the bytestring <code>0xa9059cbb</code> followed by 32 symbolic bytes, followed by the bytestring <code>0000000000000000000000000000000000000000000000000000000000000000</code>:</p>
-<pre><code class="language-sh">hevm symbolic --sig &quot;transfer(address,uint256)&quot; --arg &quot;&lt;symbolic&gt;&quot; --arg 0 --code $(&lt;dstoken.bin-runtime)
+<pre><code class="language-sh">hevm symbolic --sig "transfer(address,uint256)" --arg "&lt;symbolic&gt;" --arg 0 --code $(&lt;dstoken.bin-runtime)
 </code></pre>
-<p>If the <code>--get-models</code> flag is given, example input values will be returned for each possible execution path.
-This can be useful for automatic test case generation.</p>
-<p>The default timeout for SMT queries is no timeout. If your program is taking longer than a couple of minutes to run,
-you can experiment with configuring the timeout to somewhere around 10s by doing <code>--smttimeout 10000</code></p>
+<p>If the <code>--get-models</code> flag is given, example input values will be returned for each possible execution path. This can be useful for automatic test case generation.</p>
+<p>The default timeout for SMT queries is no timeout. If your program is taking longer than a couple of minutes to run, you can experiment with configuring the timeout to somewhere around 10s by doing <code>--smttimeout 10000</code></p>
 <p>Storage can be initialized in two ways:</p>
 <ul>
 <li><code>Empty</code>: all storage slots for all contracts are initialized to zero</li>
 <li><code>Abstract</code>: all storage slots are initialized as unconstrained abstract values</li>
 </ul>
-<p><code>hevm</code> uses an eager approach for symbolic execution, meaning that it will first attempt to explore
-all branches in the program (without querying the smt solver to check if they are reachable or not).
-Once the full execution tree has been explored, the postcondition is checked against all leaves, and
-the solver is invoked to check reachability for branches where a postcondition violation could
-occur. While our tests have shown this approach to be significantly faster, when applied without
-limits it would always result in infinite exploration of code involving loops, so after some
-predefined number of iterations (controlled by the <code>--ask-smt-iterations</code> flag), the solver will be
-invoked to check whether a given loop branch is reachable. In cases where the number of loop
-iterations is known in advance, you may be able to speed up execution by setting this flag to an
-appropriate value.</p>
+<p><code>hevm</code> uses an eager approach for symbolic execution, meaning that it will first attempt to explore all branches in the program (without querying the smt solver to check if they are reachable or not). Once the full execution tree has been explored, the postcondition is checked against all leaves, and the solver is invoked to check reachability for branches where a postcondition violation could occur. While our tests have shown this approach to be significantly faster, when applied without limits it would always result in infinite exploration of code involving loops, so after some predefined number of iterations (controlled by the <code>--ask-smt-iterations</code> flag), the solver will be invoked to check whether a given loop branch is reachable. In cases where the number of loop iterations is known in advance, you may be able to speed up execution by setting this flag to an appropriate value.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="overview.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="test.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="equivalence.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="equivalence.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -298,11 +294,11 @@ appropriate value.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="overview.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="test.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="equivalence.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="equivalence.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -326,6 +322,7 @@ appropriate value.</p>
         <script src="book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="solidity.min.js"></script>
 
 
     </div>
